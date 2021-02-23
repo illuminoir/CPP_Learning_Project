@@ -71,15 +71,29 @@ void display(void)
     glutSwapBuffers();
 }
 
+#include <chrono>
+std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::_V2::system_clock::duration> current_time;
 void timer(const int step)
 {
+    auto start_time = std::chrono::system_clock::now();
+    double delta_time = (start_time - current_time).count();
+
+    if(delta_time < 1000/60)
+    {
+        delta_time = 1000/60;
+    }
     for (auto& item : move_queue)
     {
-        item->move();
+        item->move(delta_time);
     }
+
+    //auto end_time = std::chrono::system_clock::now();
+    current_time = std::chrono::system_clock::now();
+
     glutPostRedisplay();
-    glutTimerFunc(1000u / ticks_per_sec, timer, step + 1);
+    glutTimerFunc(1000u * ticks_per_sec, timer, step + 1);
 }
+ 
 
 void init_gl(int argc, char** argv, const char* title)
 {

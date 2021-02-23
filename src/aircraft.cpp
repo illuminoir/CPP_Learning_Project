@@ -88,7 +88,7 @@ void Aircraft::add_waypoint(const Waypoint& wp, const bool front)
     }
 }
 
-void Aircraft::move()
+void Aircraft::move(int time)
 {
     if (waypoints.empty())
     {
