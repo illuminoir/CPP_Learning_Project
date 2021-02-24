@@ -39,7 +39,7 @@ public:
         }
     }
 
-    void move(int delta) override
+    void move() override
     {
         if (in_use() && is_servicing())
         {

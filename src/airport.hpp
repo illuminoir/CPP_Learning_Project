@@ -64,13 +64,16 @@ public:
 
     void display() const override { texture.draw(project_2D(pos), { 2.0f, 2.0f }); }
 
-    void move(int delta) override
+    void move() override
     {
+        std::cout << "move airport" << std::endl;
         for (auto& t : terminals)
         {
-            t.move(delta);
+            t.move();
         }
+        std::cout << "move airport done" << std::endl;
     }
+
 
     friend class Tower;
 };

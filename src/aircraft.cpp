@@ -68,6 +68,7 @@ void Aircraft::operate_landing_gear()
         {
             std::cout << flight_number << " is now landing..." << std::endl;
             landing_gear_deployed = true;
+            has_landed = true;
         }
         else if (!ground_before && !ground_after)
         {
@@ -88,10 +89,15 @@ void Aircraft::add_waypoint(const Waypoint& wp, const bool front)
     }
 }
 
-void Aircraft::move(int time)
+void Aircraft::move()
 {
+    std::cout << "moving aircraft" << std::endl;
     if (waypoints.empty())
     {
+        if(has_landed){
+            std::cout << "deleting" << std::endl;
+            delete(this);
+        }
         waypoints = control.get_instructions(*this);
     }
 
