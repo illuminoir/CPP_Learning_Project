@@ -49,6 +49,7 @@ void Aircraft::arrive_at_terminal()
     // we arrived at a terminal, so start servicing
     control.arrived_at_terminal(*this);
     is_at_terminal = true;
+    has_landed = true;
 }
 
 // deploy and retract landing gear depending on next waypoints
@@ -68,7 +69,6 @@ void Aircraft::operate_landing_gear()
         {
             std::cout << flight_number << " is now landing..." << std::endl;
             landing_gear_deployed = true;
-            has_landed = true;
         }
         else if (!ground_before && !ground_after)
         {
@@ -89,14 +89,12 @@ void Aircraft::add_waypoint(const Waypoint& wp, const bool front)
     }
 }
 
-void Aircraft::move()
+bool Aircraft::move(double delta_time)
 {
-    std::cout << "moving aircraft" << std::endl;
     if (waypoints.empty())
     {
-        if(has_landed){
-            std::cout << "deleting" << std::endl;
-            delete(this);
+        if(has_landed && !is_at_terminal){
+            return false;
         }
         waypoints = control.get_instructions(*this);
     }
@@ -105,7 +103,7 @@ void Aircraft::move()
     {
         turn_to_waypoint();
         // move in the direction of the current speed
-        pos += speed;
+        pos += speed * delta_time;
 
         // if we are close to our next waypoint, stike if off the list
         if (!waypoints.empty() && distance_to(waypoints.front()) < DISTANCE_THRESHOLD)
@@ -142,6 +140,8 @@ void Aircraft::move()
         // update the z-value of the displayable structure
         GL::Displayable::z = pos.x() + pos.y();
     }
+
+    return true;
 }
 
 void Aircraft::display() const

@@ -125,7 +125,7 @@ aussi recupérée dans GL, `GL::`
 
 3) Identifiez quelle variable contrôle le temps de débarquement des avions et doublez-le.
 
-La variable `service_progress` utilisée avec la constante `SERVICE_CYCLES`
+La variable `service_progress` utilisée avec la constante `SERVICE_CYCLES` (dans `config.hpp`)
 
 4) Lorsqu'un avion décolle, celui-ci n'est pas retiré du programme.
 Faites en sorte qu'il le soit.

@@ -15,15 +15,12 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <iostream>
 
 namespace GL {
 
 inline unsigned int ticks_per_sec = DEFAULT_TICKS_PER_SEC;
 inline float zoom                 = DEFAULT_ZOOM;
-inline bool fullscreen            = false;    
-/*sf::Clock clock;
-float deltaTime;*/
+inline bool fullscreen            = false;
 
 using KeyStroke = std::function<void(void)>;
 

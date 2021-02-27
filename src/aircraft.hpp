@@ -19,7 +19,7 @@ private:
     Tower& control;
     bool landing_gear_deployed = false; // is the landing gear deployed?
     bool is_at_terminal        = false;
-    bool has_landed            = false;
+    bool has_landed          = false;
 
     // turn the aircraft to arrive at the next waypoint
     // try to facilitate reaching the waypoint after the next by facing the
@@ -52,8 +52,7 @@ public:
         flight_number { flight_number_ },
         pos { pos_ },
         speed { speed_ },
-        control { control_ },
-        has_landed { false }
+        control { control_ }
     {
         speed.cap_length(max_speed());
     }
@@ -62,7 +61,7 @@ public:
     float distance_to(const Point3D& p) const { return pos.distance_to(p); }
 
     void display() const override;
-    void move() override;
+    bool move(double delta_time) override;
 
     friend class Tower;
 };
