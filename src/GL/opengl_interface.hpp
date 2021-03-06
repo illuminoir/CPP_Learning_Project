@@ -20,6 +20,7 @@ namespace GL {
 
 inline unsigned int ticks_per_sec = DEFAULT_TICKS_PER_SEC;
 inline float zoom                 = DEFAULT_ZOOM;
+inline float speed_incr_factor    = 1;
 inline bool fullscreen            = false;
 
 using KeyStroke = std::function<void(void)>;

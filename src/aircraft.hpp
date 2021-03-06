@@ -55,6 +55,13 @@ public:
         control { control_ }
     {
         speed.cap_length(max_speed());
+        GL::display_queue.emplace_back(this);
+        GL::move_queue.emplace(this);
+    }
+
+    ~Aircraft() 
+    {
+        GL::display_queue.erase(std::find(GL::display_queue.begin(), GL::display_queue.end(), this));
     }
 
     const std::string& get_flight_num() const { return flight_number; }

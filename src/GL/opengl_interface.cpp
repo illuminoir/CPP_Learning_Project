@@ -2,7 +2,6 @@
 
 std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::_V2::system_clock::duration> current_time;
 
-
 namespace GL {
 
 void handle_error(const std::string& prefix, const GLenum err)
@@ -79,25 +78,31 @@ void timer(const int step)
     std::chrono::duration<float> dDelta_time = (start_time - current_time);
     std::chrono::milliseconds mDelta_time = std::chrono::duration_cast<std::chrono::milliseconds>(dDelta_time);
 
-    float delta_time = mDelta_time.count();
+    float delta_time = (mDelta_time.count()/1000.f) * speed_incr_factor;
 
-    if(delta_time < 1000/60)
-    {
-        delta_time = 1000/60;
-    }
 
-    //for (auto& item : move_queue)
-    for(auto it = move_queue.begin() ; it != move_queue.end(); it++)
+    for(auto it = move_queue.begin() ; it != move_queue.end();)
     {
 
-        if(!((*it)->move(std::min(delta_time/1000, (1000/60.f)))))
+        //if(!((*it)->move(std::min(delta_time/1000, (1000/60.f)))))
+        auto& aircraft = *it;
+
+        if(!(*it)->move(delta_time))
         {
-            auto casted_item = dynamic_cast<const GL::Displayable*>(*it);
+
+            //auto casted_item = dynamic_cast<const GL::Displayable*>(*it);
+
+            //it = GL::move_queue.erase(it);
+            //if(std::find(GL::display_queue.begin(), GL::display_queue.end(), casted_item) != GL::display_queue.end()) {
+            //    GL::display_queue.erase(std::remove(GL::display_queue.begin(), GL::display_queue.end(), casted_item));
+            //}            
+
             it = GL::move_queue.erase(it);
-            if(std::find(GL::display_queue.begin(), GL::display_queue.end(), casted_item) != GL::display_queue.end()) {
-                GL::display_queue.erase(std::remove(GL::display_queue.begin(), GL::display_queue.end(), casted_item));
-            }
-            delete(*it);
+            delete(aircraft);
+        }
+        else 
+        {
+            ++it;
         }
     }
 

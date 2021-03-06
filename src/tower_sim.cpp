@@ -39,9 +39,8 @@ void TowerSimulation::create_aircraft(const AircraftType& type) const
     const Point3D start     = Point3D { std::sin(angle), std::cos(angle), 0 } * 3 + Point3D { 0, 0, 2 };
     const Point3D direction = (-start).normalize();
 
-    Aircraft* aircraft = new Aircraft { type, flight_number, start, direction, airport->get_tower() };
-    GL::display_queue.emplace_back(aircraft);
-    GL::move_queue.emplace(aircraft);
+    //Aircraft* aircraft = 
+    new Aircraft { type, flight_number, start, direction, airport->get_tower() };
 }
 
 void TowerSimulation::create_random_aircraft() const
@@ -59,6 +58,8 @@ void TowerSimulation::create_keystrokes() const
     GL::keystrokes.emplace('f', []() { GL::toggle_fullscreen(); });
     GL::keystrokes.emplace('b', []() { GL::ticks_per_sec++; std::cout<<"fps : " << GL::ticks_per_sec<<std::endl; });
     GL::keystrokes.emplace('n', []() { GL::ticks_per_sec--; std::cout<<"fps : " << GL::ticks_per_sec<<std::endl;});
+    GL::keystrokes.emplace('a', []() { GL::speed_incr_factor += 0.1; std::cout<<"speed : " << GL::speed_incr_factor<<std::endl; });
+    GL::keystrokes.emplace('z', []() { GL::speed_incr_factor -= 0.1; std::cout<<"speed : " << GL::speed_incr_factor<<std::endl;});
 }
 
 void TowerSimulation::display_help() const
@@ -78,9 +79,6 @@ void TowerSimulation::init_airport()
 {
     airport = new Airport { one_lane_airport, Point3D { 0, 0, 0 },
                             new img::Image { one_lane_airport_sprite_path.get_full_path() } };
-
-    GL::display_queue.emplace_back(airport);
-    GL::move_queue.emplace(airport);
 }
 
 void TowerSimulation::launch()

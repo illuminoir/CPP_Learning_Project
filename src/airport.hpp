@@ -58,7 +58,19 @@ public:
         texture { image },
         terminals { type.create_terminals() },
         tower { *this }
-    {}
+    {
+        GL::display_queue.emplace_back(this);
+        GL::move_queue.emplace(this);
+    }
+
+
+    ~Airport() 
+    {
+        /*GL::move_queue.erase(this);
+        auto displayable_airport = dynamic_cast<const Displayable*>(this); 
+        GL::display_queue.erase(std::remove(GL::display_queue.begin(), GL::display_queue.end(), displayable_airport));
+        */
+    }
 
     Tower& get_tower() { return tower; }
 
