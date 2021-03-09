@@ -56,7 +56,8 @@ public:
     {
         speed.cap_length(max_speed());
         GL::display_queue.emplace_back(this);
-        GL::move_queue.emplace(this);
+        //GL::move_queue.emplace(this);
+
     }
 
     ~Aircraft() 

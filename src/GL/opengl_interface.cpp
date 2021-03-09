@@ -80,33 +80,11 @@ void timer(const int step)
 
     float delta_time = (mDelta_time.count()/1000.f) * speed_incr_factor;
 
-
-    for(auto it = move_queue.begin() ; it != move_queue.end();)
+    for(auto it = move_queue.begin() ; it != move_queue.end(); ++it)
     {
-
-        //if(!((*it)->move(std::min(delta_time/1000, (1000/60.f)))))
-        auto& aircraft = *it;
-
-        if(!(*it)->move(delta_time))
-        {
-
-            //auto casted_item = dynamic_cast<const GL::Displayable*>(*it);
-
-            //it = GL::move_queue.erase(it);
-            //if(std::find(GL::display_queue.begin(), GL::display_queue.end(), casted_item) != GL::display_queue.end()) {
-            //    GL::display_queue.erase(std::remove(GL::display_queue.begin(), GL::display_queue.end(), casted_item));
-            //}            
-
-            it = GL::move_queue.erase(it);
-            delete(aircraft);
-        }
-        else 
-        {
-            ++it;
-        }
+        (*it)->move(delta_time);
     }
 
-    //auto end_time = std::chrono::system_clock::now();
     current_time = std::chrono::system_clock::now();
 
     glutPostRedisplay();
