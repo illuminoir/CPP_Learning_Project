@@ -16,6 +16,7 @@ class AircraftManager : public GL::DynamicObject, public GL::Displayable {
         AircraftManager();
         ~AircraftManager(){}
         //static AircraftManager* get_instance();
+        int aircrafts_airline_count(const std::string& airline);
 
         bool move(double delta_time) override;
         void display() const override;

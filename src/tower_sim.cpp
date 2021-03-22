@@ -52,6 +52,14 @@ void TowerSimulation::create_keystrokes()
     GL::keystrokes.emplace('n', []() { GL::ticks_per_sec--; std::cout<<"fps : " << GL::ticks_per_sec<<std::endl;});
     GL::keystrokes.emplace('a', []() { GL::speed_incr_factor += 0.1; std::cout<<"speed : " << GL::speed_incr_factor<<std::endl; });
     GL::keystrokes.emplace('z', []() { GL::speed_incr_factor -= 0.1; std::cout<<"speed : " << GL::speed_incr_factor<<std::endl;});
+
+    const auto& airlines = aircraft_factory.get_airlines();
+
+    for(size_t i = 0 ; i < airlines.size() ; ++i)
+    {
+        GL::keystrokes.emplace('0' + i, [airlines, this, i]() { std::cout << "Airline " << airlines[i] << " : " <<
+                                                        aircraft_manager.aircrafts_airline_count(airlines[i]) << std::endl; });
+    }
 }
 
 void TowerSimulation::display_help() const
@@ -59,9 +67,9 @@ void TowerSimulation::display_help() const
     std::cout << "This is an airport tower simulator" << std::endl
               << "the following keysstrokes have meaning:" << std::endl;
 
-    for (const auto& ks_pair : GL::keystrokes)
+    for (const auto& [input, keystroke] : GL::keystrokes)
     {
-        std::cout << ks_pair.first << ' ';
+        std::cout << input << ' ';
     }
 
     std::cout << std::endl;

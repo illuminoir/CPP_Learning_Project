@@ -22,9 +22,21 @@ AircraftManager* AircraftManager::get_instance()
 */
 
 
+int AircraftManager::aircrafts_airline_count(const std::string& airline)
+{
+    auto begin = aircrafts.begin();
+    auto end   = aircrafts.end();
+    return std::count_if(begin, end, [airline](const std::unique_ptr<Aircraft>& aircraft)
+                         { return aircraft->get_flight_num().compare(0, airline.size(), airline) == 0; });
+}
+
 bool AircraftManager::move(double delta_time)
 {
-
+    auto begin = aircrafts.begin();
+    auto end   = aircrafts.end();
+    aircrafts.erase(std::remove_if(begin, end, 
+        [delta_time](std::unique_ptr<Aircraft>& aircraft){ return !(aircraft->move(delta_time));}), end);
+/*
     for(auto it = aircrafts.begin() ; it != aircrafts.end();)
     {
         if(!(*it)->move(delta_time))
@@ -37,7 +49,7 @@ bool AircraftManager::move(double delta_time)
             ++it;
         }
     }
-
+*/
     return false;
 }
 

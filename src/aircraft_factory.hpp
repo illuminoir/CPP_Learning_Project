@@ -19,9 +19,11 @@ class AircraftFactory
         std::string generate_unique_flight_number();
     
     public:
-        const std::string airlines[8] = { "AF", "LH", "EY", "DL", "KL", "BA", "AY", "EY" };
+        const static size_t NUM_AIRLINES = 8;
+        std::array<std::string, NUM_AIRLINES> airlines = { "AF", "LH", "EY", "DL", "KL", "BA", "AY", "EY" };
         static const size_t NUM_AIRCRAFT_TYPES = 3;
         AircraftType* aircraft_types[NUM_AIRCRAFT_TYPES] {};
+        const std::array<std::string, NUM_AIRLINES> get_airlines() { return airlines; };
 
 
         void init_aircraft_types()
