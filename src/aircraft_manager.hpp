@@ -11,6 +11,7 @@ class AircraftManager : public GL::DynamicObject, public GL::Displayable {
     private:
         //static AircraftManager* _instance;
         std::vector<std::unique_ptr<Aircraft>> aircrafts;
+        int crashed_aircrafts_count = 0;
 
     public:
         AircraftManager();
@@ -22,6 +23,9 @@ class AircraftManager : public GL::DynamicObject, public GL::Displayable {
         void display() const override;
         void add_aircraft(std::unique_ptr<Aircraft> aircraft);
         //void create(const Tower& tower) const;
+        inline int get_crashed_aircrafts_count() const { return crashed_aircrafts_count; }
+
+        int get_required_fuel();
 };
 
 

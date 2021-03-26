@@ -6,6 +6,7 @@
 #include "geometry.hpp"
 #include "tower.hpp"
 #include "waypoint.hpp"
+#include <stdlib.h>
 
 #include <string>
 #include <string_view>
@@ -20,7 +21,9 @@ private:
     Tower& control;
     bool landing_gear_deployed = false; // is the landing gear deployed?
     bool is_at_terminal        = false;
-    bool has_landed          = false;
+    bool has_landed            = false;
+    bool has_crashed           = false;
+    float fuel;
 
     // turn the aircraft to arrive at the next waypoint
     // try to facilitate reaching the waypoint after the next by facing the
@@ -44,22 +47,31 @@ private:
 
     Aircraft(const Aircraft&) = delete;
     Aircraft& operator=(const Aircraft&) = delete;
+    bool operator<(Aircraft&);
 
 public:
     Aircraft(const AircraftType& type_, const std::string_view& flight_number_, const Point3D& pos_,
-             const Point3D& speed_, Tower& control_) :
+             const Point3D& speed_, Tower& control_, const float fuel_) :
         GL::Displayable { pos_.x() + pos_.y() },
         type { type_ },
         flight_number { flight_number_ },
         pos { pos_ },
         speed { speed_ },
-        control { control_ }
+        control { control_ },
+        fuel { fuel_ }
     {
         speed.cap_length(max_speed());
         GL::display_queue.emplace_back(this);
-        //GL::move_queue.emplace(this);
 
     }
+
+    bool has_terminal() const;
+    bool is_circling() const;
+    bool is_out_of_sim() const;
+    inline void crash() { has_crashed = true;}
+    bool is_low_on_fuel() const;
+    int get_fuel() { return fuel; }
+    bool has_left_airport() const { return has_landed && !is_on_ground(); }
 
     ~Aircraft() 
     {
@@ -71,6 +83,7 @@ public:
 
     void display() const override;
     bool move(double delta_time) override;
+    void refill(int& fuel_stock);
 
     friend class Tower;
 };

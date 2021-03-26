@@ -79,6 +79,21 @@ struct Point3D
     float& z() { return values[2]; }
     float z() const { return values[2]; }
 
+    std::string to_string()
+    {
+        std::string msg;
+
+        msg += "(";
+        msg += std::to_string(x());
+        msg += ",";
+        msg += std::to_string(y());
+        msg += ",";
+        msg += std::to_string(z());
+        msg += ")";
+
+        return msg;
+    }
+
     Point3D& operator+=(const Point3D& other)
     {
         std::transform(values.begin(), values.end(), other.values.begin(), values.begin(), std::plus<float>());
@@ -130,7 +145,12 @@ struct Point3D
 
     Point3D operator-() const { return Point3D { -x(), -y(), -z() }; }
 
-    float length() const { return std::sqrt(std::reduce(values.begin(), values.end(), 0, [](int v1, int v2){ return (v1*v1) + (v2*v2);})); }
+    float length() const 
+    {
+        //return std::sqrt(x() * x() + y() * y() + z() * z());
+        return std::sqrt(std::reduce(values.begin(), values.end(), 0.f, [](float v1, float v2){ return v1 + (v2*v2); }));
+    }
+    //float length() const { return std::sqrt(std::reduce(values.begin(), values.end(), 0, [](float v1, float v2){ return (v1*v1) + (v2*v2);})); }
 
     float distance_to(const Point3D& other) const { return (*this - other).length(); }
 

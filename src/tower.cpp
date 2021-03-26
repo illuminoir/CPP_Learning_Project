@@ -17,24 +17,14 @@ WaypointQueue Tower::get_instructions(Aircraft& aircraft)
 {
     if (!aircraft.is_at_terminal)
     {
-        // if the aircraft is far, then just guide it to the airport vicinity
-        if (aircraft.distance_to(airport.pos) < 5)
+        auto p = reserve_terminal(aircraft);
+        if(p.empty())
         {
-            // try and reserve a terminal for the craft to land
-            const auto vp = airport.reserve_terminal(aircraft);
-            if (!vp.first.empty())
-            {
-                reserved_terminals.emplace(&aircraft, vp.second);
-                return vp.first;
-            }
-            else
-            {
-                return get_circle();
-            }
+            return get_circle();
         }
         else
         {
-            return get_circle();
+            return p;
         }
     }
     else
@@ -65,4 +55,28 @@ void Tower::arrived_at_terminal(const Aircraft& aircraft)
     const auto it = reserved_terminals.find(&aircraft);
     assert(it != reserved_terminals.end());
     airport.get_terminal(it->second).start_service(aircraft);
+}
+
+WaypointQueue Tower::reserve_terminal(Aircraft& aircraft)
+{        
+    // if the aircraft is far, then just guide it to the airport vicinity
+        if (aircraft.distance_to(airport.pos) < 5)
+        {
+            //this->reserve_terminal(aircraft); 
+            // try and reserve a terminal for the craft to land
+            const auto vp = airport.reserve_terminal(aircraft);
+            if (!vp.first.empty())
+            {
+                reserved_terminals.emplace(&aircraft, vp.second);
+                return vp.first;
+            }
+            else
+            {
+                return get_circle();
+            }
+        }
+        else
+        {
+            return {};
+        }
 }

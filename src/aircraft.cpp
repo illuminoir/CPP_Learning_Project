@@ -89,18 +89,79 @@ void Aircraft::add_waypoint(const Waypoint& wp, const bool front)
     }
 }
 
-bool Aircraft::move(double delta_time)
+bool Aircraft::is_out_of_sim() const{
+    return has_crashed || (has_landed && waypoints.empty() && !is_at_terminal);
+}
+
+
+bool Aircraft::is_low_on_fuel() const
 {
-    if (waypoints.empty())
+    return this->fuel < 200;
+}
+
+
+bool Aircraft::operator<(Aircraft& other)
+{
+    if(this->has_terminal())
     {
-        if(has_landed && !is_at_terminal){
+        if(!other.has_terminal())
+        {
+            return true;
+        }
+        else
+        {
+            if(this->fuel <= other.fuel)
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+        }
+    }
+
+    else 
+    {
+        if(other.has_terminal())
+        {
             return false;
         }
+        else
+        {
+            if(this->fuel <= other.fuel)
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+        }
+    }
+}
+
+bool Aircraft::move(double delta_time)
+{    
+    if (waypoints.empty())
+    {
         waypoints = control.get_instructions(*this);
+    }
+
+    this->fuel -= 0.5;
+
+    if(fuel <= 0.)
+    {
+        using namespace std::string_literals;
+        throw AircraftCrash { flight_number, pos, speed, " has no fuel remaining"s };
     }
 
     if (!is_at_terminal)
     {
+        if(is_circling() && waypoints.empty())
+        {
+            waypoints = control.get_instructions(*this);
+        }
         turn_to_waypoint();
         // move in the direction of the current speed
         pos += speed * delta_time;
@@ -124,7 +185,7 @@ bool Aircraft::move(double delta_time)
             if (!landing_gear_deployed)
             {
                 using namespace std::string_literals;
-                throw AircraftCrash { flight_number + " crashed into the ground"s };
+                throw AircraftCrash { flight_number, pos, speed, " crashed into the ground"s };
             }
         }
         else
@@ -149,8 +210,37 @@ void Aircraft::display() const
     type.texture.draw(project_2D(pos), { PLANE_TEXTURE_DIM, PLANE_TEXTURE_DIM }, get_speed_octant());
 }
 
+bool Aircraft::has_terminal() const
+{
+    if(!waypoints.empty())
+    {
+        return waypoints.back().type == WaypointType::wp_terminal;
+    }
+    return false;
+}
 
 bool Aircraft::is_circling() const
 {
-    return !is_at_terminal;
+    return !has_landed && !has_terminal();
 }
+
+void Aircraft::refill(int& fuel_stock)
+{
+    float missing_fuel = 3000 - this->fuel;
+    int to_refill;
+
+    if(missing_fuel < fuel_stock)
+    {
+        to_refill = missing_fuel;
+    }
+    else
+    {
+        to_refill = fuel_stock;
+    }
+
+    fuel_stock -= to_refill;
+    this->fuel += to_refill;
+
+    std::cout << "Aircraft " << this->get_flight_num() << " refilled with " << missing_fuel << "T" << std::endl;
+}
+

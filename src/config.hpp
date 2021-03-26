@@ -1,6 +1,7 @@
 #pragma once
 
 #include "img/media_path.hpp"
+#include "geometry.hpp"
 
 #include <stdexcept>
 
@@ -21,11 +22,38 @@ constexpr unsigned char NUM_AIRCRAFT_TILES = 8;
 // size of the plane-sprite on screen
 constexpr float PLANE_TEXTURE_DIM = 0.2f;
 // default number of ticks per second
-constexpr unsigned int DEFAULT_TICKS_PER_SEC = 16u;
+constexpr unsigned int DEFAULT_TICKS_PER_SEC = 32u;
 // default zoom factor
 constexpr float DEFAULT_ZOOM = 2.0f;
 // default window dimensions
 constexpr size_t DEFAULT_WINDOW_WIDTH  = 800;
 constexpr size_t DEFAULT_WINDOW_HEIGHT = 600;
 
-using AircraftCrash = std::runtime_error;
+//using AircraftCrash = std::runtime_error;
+
+class AircraftCrash : public std::runtime_error
+{
+    public:
+        AircraftCrash(std::string flight_number, Point3D pos, Point3D speed, std::string reason)
+            : std::runtime_error { build_error_msg(flight_number, pos, speed, reason) }
+        {}
+
+    private:
+        static std::string build_error_msg(std::string flight_number, Point3D pos, 
+                Point3D speed, std::string reason)
+        {
+            using namespace std::string_literals;
+
+            std::string msg;
+            msg += "Aircraft ";
+            msg += flight_number;
+            msg += " crashed at position ";
+            msg += pos.to_string();
+            msg += " and speed ";
+            msg += speed.to_string();
+            msg += " because it";
+            msg += reason;
+
+            return msg;
+        }
+};

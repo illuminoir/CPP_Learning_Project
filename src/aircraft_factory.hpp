@@ -7,6 +7,7 @@
 #include "aircraft_types.hpp"
 
 #include <array>
+#include <random>
 
 class Aircraft;
 class Tower;
@@ -17,6 +18,8 @@ class AircraftFactory
         std::unordered_set<std::string> registered_flights;
         bool flight_is_registered(std::string) const;
         std::string generate_unique_flight_number();
+        std::mt19937 rengine;
+        std::uniform_real_distribution<float> range;
     
     public:
         const static size_t NUM_AIRLINES = 8;
@@ -33,7 +36,10 @@ class AircraftFactory
             aircraft_types[2] = new AircraftType { .8f, 1.6f, .8f, MediaPath { "concorde_af.png" } };
         }
         AircraftFactory()
-        {}
+        : rengine {std::random_device{}()}
+        , range{150.f,3000.f}
+        {
+        }
 
         [[nodiscard]] std::unique_ptr<Aircraft> create_random_aircraft(Tower& tower);
 
