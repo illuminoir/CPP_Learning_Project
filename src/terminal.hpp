@@ -18,6 +18,10 @@ private:
 
 public:
     Terminal(const Point3D& pos_) : pos { pos_ } {}
+    ~Terminal()
+    {
+        GL::move_queue.erase(std::find(GL::move_queue.begin(), GL::move_queue.end(), this));
+    }
 
     bool in_use() const { return current_aircraft != nullptr; }
     bool is_servicing() const { return service_progress < SERVICE_CYCLES; }
@@ -49,7 +53,7 @@ public:
         return true;
     }
 
-    void refill_aircraft_if_needed(int& fuel_stock)
+    void refill_aircraft_if_needed(float& fuel_stock)
     {
         if(in_use() && is_servicing() && current_aircraft->is_low_on_fuel())
         {

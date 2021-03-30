@@ -96,64 +96,14 @@ bool Aircraft::is_out_of_sim() const{
 
 bool Aircraft::is_low_on_fuel() const
 {
-    return this->fuel < 200;
-}
-
-
-bool Aircraft::operator<(Aircraft& other)
-{
-    if(this->has_terminal())
-    {
-        if(!other.has_terminal())
-        {
-            return true;
-        }
-        else
-        {
-            if(this->fuel <= other.fuel)
-            {
-                return true;
-            }
-            else 
-            {
-                return false;
-            }
-        }
-    }
-
-    else 
-    {
-        if(other.has_terminal())
-        {
-            return false;
-        }
-        else
-        {
-            if(this->fuel <= other.fuel)
-            {
-                return true;
-            }
-            else 
-            {
-                return false;
-            }
-        }
-    }
+    return fuel < 200;
 }
 
 bool Aircraft::move(double delta_time)
-{    
+{   
     if (waypoints.empty())
     {
         waypoints = control.get_instructions(*this);
-    }
-
-    this->fuel -= 0.5;
-
-    if(fuel <= 0.)
-    {
-        using namespace std::string_literals;
-        throw AircraftCrash { flight_number, pos, speed, " has no fuel remaining"s };
     }
 
     if (!is_at_terminal)
@@ -190,6 +140,12 @@ bool Aircraft::move(double delta_time)
         }
         else
         {
+            fuel -= 0.5;
+            if(fuel < 0.)
+            {
+                using namespace std::string_literals;
+                throw AircraftCrash { flight_number, pos, speed, " has no fuel remaining"s };
+            }
             // if we are in the air, but too slow, then we will sink!
             const float speed_len = speed.length();
             if (speed_len < SPEED_THRESHOLD)
@@ -224,9 +180,9 @@ bool Aircraft::is_circling() const
     return !has_landed && !has_terminal();
 }
 
-void Aircraft::refill(int& fuel_stock)
+void Aircraft::refill(float& fuel_stock)
 {
-    float missing_fuel = 3000 - this->fuel;
+    float missing_fuel = 3000.f - fuel;
     int to_refill;
 
     if(missing_fuel < fuel_stock)
@@ -239,8 +195,8 @@ void Aircraft::refill(int& fuel_stock)
     }
 
     fuel_stock -= to_refill;
-    this->fuel += to_refill;
+    fuel += to_refill;
 
-    std::cout << "Aircraft " << this->get_flight_num() << " refilled with " << missing_fuel << "T" << std::endl;
+    std::cout << "Aircraft " << get_flight_num() << " refilled with " << missing_fuel << "T" << std::endl;
 }
 

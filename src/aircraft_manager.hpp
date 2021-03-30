@@ -6,26 +6,24 @@
 #include "GL/displayable.hpp"
 #include <vector>
 #include <memory>
+#include <tuple>
 
 class AircraftManager : public GL::DynamicObject, public GL::Displayable {
     private:
-        //static AircraftManager* _instance;
         std::vector<std::unique_ptr<Aircraft>> aircrafts;
-        int crashed_aircrafts_count = 0;
+        unsigned int crashed_aircrafts_count = 0;
 
     public:
         AircraftManager();
-        ~AircraftManager(){}
-        //static AircraftManager* get_instance();
         int aircrafts_airline_count(const std::string& airline);
 
         bool move(double delta_time) override;
         void display() const override;
         void add_aircraft(std::unique_ptr<Aircraft> aircraft);
-        //void create(const Tower& tower) const;
-        inline int get_crashed_aircrafts_count() const { return crashed_aircrafts_count; }
+        inline unsigned int get_crashed_aircrafts_count() const { return crashed_aircrafts_count; }
 
-        int get_required_fuel();
+        float get_required_fuel();
+        bool compare_two_aircrafts(std::unique_ptr<Aircraft>& a1, std::unique_ptr<Aircraft>& a2);
 };
 
 

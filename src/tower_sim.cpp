@@ -13,8 +13,6 @@
 
 using namespace std::string_literals;
 
-//const std::string airlines[8] = { "AF", "LH", "EY", "DL", "KL", "BA", "AY", "EY" };
-
 TowerSimulation::TowerSimulation(int argc, char** argv) :
     help { (argc > 1) && (std::string { argv[1] } == "--help"s || std::string { argv[1] } == "-h"s) }
 {
@@ -36,8 +34,6 @@ void TowerSimulation::create_aircraft()
     assert(airport);
 
     aircraft_manager.add_aircraft(aircraft_factory.create_random_aircraft(airport->get_tower()));
-
-    //create_aircraft(*(aircraft_types[rand() % 3]));
 }
 
 void TowerSimulation::create_keystrokes()
@@ -48,11 +44,22 @@ void TowerSimulation::create_keystrokes()
     GL::keystrokes.emplace('+', []() { GL::change_zoom(0.95f); });
     GL::keystrokes.emplace('-', []() { GL::change_zoom(1.05f); });
     GL::keystrokes.emplace('f', []() { GL::toggle_fullscreen(); });
-    GL::keystrokes.emplace('b', []() { GL::ticks_per_sec++; std::cout<<"fps : " << GL::ticks_per_sec<<std::endl; });
-    GL::keystrokes.emplace('n', []() { if(GL::ticks_per_sec > 1){ GL::ticks_per_sec--; std::cout<<"fps : " << GL::ticks_per_sec<<std::endl;} });
-    GL::keystrokes.emplace('a', []() { GL::speed_incr_factor += 0.1; std::cout<<"speed : " << GL::speed_incr_factor<<std::endl; });
-    GL::keystrokes.emplace('z', []() { GL::speed_incr_factor -= 0.1; std::cout<<"speed : " << GL::speed_incr_factor<<std::endl;});
-    GL::keystrokes.emplace('m', [this]() { std::cout << aircraft_manager.get_crashed_aircrafts_count() << " aircrafts crashed" << std::endl; });
+    GL::keystrokes.emplace('b', []() { GL::ticks_per_sec++; 
+                                       std::cout<<"fps : " << GL::ticks_per_sec<<std::endl; });
+    GL::keystrokes.emplace('n', []()
+                                { 
+                                    if(GL::ticks_per_sec > 1){ 
+                                        GL::ticks_per_sec--;
+                                        std::cout<<"fps : " << GL::ticks_per_sec<<std::endl;} 
+                                });
+    GL::keystrokes.emplace('a', []() { GL::speed_incr_factor += 0.1; 
+                                       std::cout<<"speed : " << GL::speed_incr_factor<<std::endl; });
+    GL::keystrokes.emplace('z', []() { GL::speed_incr_factor -= 0.1; 
+                                       std::cout<<"speed : " << GL::speed_incr_factor<<std::endl; });
+    GL::keystrokes.emplace('m', [this]() 
+                                { 
+                                    std::cout << aircraft_manager.get_crashed_aircrafts_count() << " aircrafts crashed" << std::endl;
+                                });
 
     const auto& airlines = aircraft_factory.get_airlines();
 
@@ -78,6 +85,8 @@ void TowerSimulation::display_help() const
 
 void TowerSimulation::init_airport()
 {
+    assert(airport == nullptr);
+
     airport = new Airport { one_lane_airport, Point3D { 0, 0, 0 },
                             new img::Image { one_lane_airport_sprite_path.get_full_path() },
                             aircraft_manager };

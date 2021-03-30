@@ -3,7 +3,6 @@
 #include "GL/texture.hpp"
 #include "img/image.hpp"
 #include "img/media_path.hpp"
-
 #include "aircraft_types.hpp"
 
 #include <array>
@@ -16,18 +15,19 @@ class AircraftFactory
 {
     private:
         std::unordered_set<std::string> registered_flights;
+        std::mt19937 rengine;
+        std::uniform_real_distribution<float> fuel_rd_dist;
+
         bool flight_is_registered(std::string) const;
         std::string generate_unique_flight_number();
-        std::mt19937 rengine;
-        std::uniform_real_distribution<float> range;
     
     public:
         const static size_t NUM_AIRLINES = 8;
         std::array<std::string, NUM_AIRLINES> airlines = { "AF", "LH", "EY", "DL", "KL", "BA", "AY", "EY" };
-        static const size_t NUM_AIRCRAFT_TYPES = 3;
+        const static size_t NUM_AIRCRAFT_TYPES = 3;
         AircraftType* aircraft_types[NUM_AIRCRAFT_TYPES] {};
-        const std::array<std::string, NUM_AIRLINES> get_airlines() { return airlines; };
 
+        const std::array<std::string, NUM_AIRLINES> get_airlines() { return airlines; };
 
         void init_aircraft_types()
         {
@@ -37,9 +37,8 @@ class AircraftFactory
         }
         AircraftFactory()
         : rengine {std::random_device{}()}
-        , range{150.f,3000.f}
-        {
-        }
+        , fuel_rd_dist{150.f,3000.f}
+        {}
 
         [[nodiscard]] std::unique_ptr<Aircraft> create_random_aircraft(Tower& tower);
 

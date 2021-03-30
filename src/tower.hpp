@@ -24,13 +24,7 @@ private:
     AircraftToTerminal reserved_terminals = {};
 
     WaypointQueue get_circle() const;
-/*
-    AircraftAndTerminalIter find_craft_and_terminal(const Aircraft& aircraft)
-    {
-        return std::find_if(reserved_terminals.begin(), reserved_terminals.end(),
-                            [&aircraft](const auto& x) { return x.first == &aircraft; });
-    }
-*/
+
 public:
     Tower(Airport& airport_) : airport { airport_ } {}
 

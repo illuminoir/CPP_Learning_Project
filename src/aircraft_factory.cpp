@@ -33,15 +33,12 @@ std::string AircraftFactory::generate_unique_flight_number()
 
 std::unique_ptr<Aircraft> AircraftFactory::create_aircraft(const AircraftType& type, Tower& tower)
 {
-    //AircraftManager* manager = AircraftManager::get_instance();
-
     const std::string flight_number = generate_unique_flight_number();
     const float angle               = (rand() % 1000) * 2 * 3.141592f / 1000.f; // random angle between 0 and 2pi
     const Point3D start             = Point3D { std::sin(angle), std::cos(angle), 0 } * 3 + Point3D { 0, 0, 2 };
     const Point3D direction         = (-start).normalize();
 
-    auto fuel = range(rengine);
+    auto fuel = fuel_rd_dist(rengine);
 
-    //manager->add_aircraft();
     return std::make_unique<Aircraft>(type, flight_number, start, direction, tower, fuel);
 }

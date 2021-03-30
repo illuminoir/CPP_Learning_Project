@@ -8,39 +8,28 @@ AircraftManager::AircraftManager()
     GL::display_queue.emplace_back(this);
 }
 
-//AircraftManager* AircraftManager::_instance = nullptr;
-
-/*
-AircraftManager* AircraftManager::get_instance()
-{
-    if(_instance == nullptr)
-    {
-        _instance = new AircraftManager();
-    }
-    return _instance;
-}
-*/
-
-
 int AircraftManager::aircrafts_airline_count(const std::string& airline)
 {
-    auto begin = aircrafts.begin();
-    auto end   = aircrafts.end();
-    return std::count_if(begin, end, [airline](const std::unique_ptr<Aircraft>& aircraft)
+    return std::count_if(aircrafts.begin(), aircrafts.end(), [&airline](const std::unique_ptr<Aircraft>& aircraft)
                          { return aircraft->get_flight_num().compare(0, airline.size(), airline) == 0; });
+}
+
+bool AircraftManager::compare_two_aircrafts(std::unique_ptr<Aircraft>& a1, std::unique_ptr<Aircraft>& a2)
+{   
+    return std::make_tuple(a1->has_terminal(), a1->get_fuel()) < std::make_tuple(a2->has_terminal(), a2->get_fuel()); 
 }
 
 bool AircraftManager::move(double delta_time)
 {
+    assert(delta_time != 0);
 
-    std::sort(aircrafts.begin(), aircrafts.begin(), [](std::unique_ptr<Aircraft>& a1, std::unique_ptr<Aircraft>& a2){ return a1 < a2; });
+    std::sort(aircrafts.begin(), aircrafts.begin(),
+                    [this]
+                    (std::unique_ptr<Aircraft>& a1, std::unique_ptr<Aircraft>& a2)
+                    { return compare_two_aircrafts(a1,a2); });
 
-    auto begin = aircrafts.begin();
-    auto end   = aircrafts.end();
-
-    for(auto it = begin ; it != end ; )
+    for(std::unique_ptr<Aircraft>& aircraft : aircrafts)
     {
-        auto& aircraft = *it;
         try {
             aircraft->move(delta_time);
         }
@@ -50,25 +39,10 @@ bool AircraftManager::move(double delta_time)
             crashed_aircrafts_count++;
             std::cerr << crash.what() << std::endl;
         }
-        ++it;
     }
-    aircrafts.erase(std::remove_if(begin, end, 
-        [](std::unique_ptr<Aircraft>& aircraft){ return aircraft->is_out_of_sim(); }), end);
-    
-/*
-    for(auto it = aircrafts.begin() ; it != aircrafts.end();)
-    {
-        if(!(*it)->move(delta_time))
-        { 
-            it = aircrafts.erase(it);
-            //it->reset();
-        }
-        else 
-        {
-            ++it;
-        }
-    }
-*/
+    aircrafts.erase(std::remove_if(aircrafts.begin(), aircrafts.end(), 
+        [](std::unique_ptr<Aircraft>& aircraft){ return aircraft->is_out_of_sim(); }), aircrafts.end());
+
     return false;
 }
 
@@ -85,13 +59,13 @@ void AircraftManager::add_aircraft(std::unique_ptr<Aircraft> aircraft)
     aircrafts.emplace_back(std::move(aircraft));
 }
 
-int AircraftManager::get_required_fuel()
+float AircraftManager::get_required_fuel()
 {
-    auto missing_fuel = [](int sum, std::unique_ptr<Aircraft>& a)
+    auto missing_fuel = [](float sum, std::unique_ptr<Aircraft>& a)
     {
         if(a->is_low_on_fuel() && !a->has_left_airport())
         {
-           return sum + 3000 - a->get_fuel();
+           return sum + 3000.f - a->get_fuel();
         }
         return sum;
     };

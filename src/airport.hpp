@@ -21,8 +21,8 @@ private:
     const GL::Texture2D texture;
     std::vector<Terminal> terminals;
     Tower tower;
-    int fuel_stock = 0;
-    int ordered_fuel = 0;
+    float fuel_stock = 0;
+    float ordered_fuel = 0;
     int next_refill_time = 0;
     AircraftManager& manager;
 
@@ -72,11 +72,9 @@ public:
 
 
     ~Airport() 
-    {
-        /*GL::move_queue.erase(this);
-        auto displayable_airport = dynamic_cast<const Displayable*>(this); 
-        GL::display_queue.erase(std::remove(GL::display_queue.begin(), GL::display_queue.end(), displayable_airport));
-        */
+    {        
+        GL::move_queue.erase(std::find(GL::move_queue.begin(), GL::move_queue.end(), this));
+        GL::display_queue.erase(std::find(GL::display_queue.begin(), GL::display_queue.end(), this));
     }
 
     Tower& get_tower() { return tower; }
@@ -88,7 +86,7 @@ public:
         if(next_refill_time == 0)
         {
             fuel_stock += ordered_fuel;
-            ordered_fuel = std::min(5000, manager.get_required_fuel());
+            ordered_fuel = std::min(5000.f, manager.get_required_fuel());
             next_refill_time = 100;
             std::cout << "Fuel stock : " << fuel_stock << std::endl;
             std::cout << "Ordered fuel : " << ordered_fuel << std::endl;

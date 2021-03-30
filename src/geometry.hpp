@@ -97,28 +97,18 @@ struct Point3D
     Point3D& operator+=(const Point3D& other)
     {
         std::transform(values.begin(), values.end(), other.values.begin(), values.begin(), std::plus<float>());
-        // x() += other.x();
-        // y() += other.y();
-        // z() += other.z();
         return *this;
     }
 
     Point3D& operator-=(const Point3D& other)
     {        
         std::transform(values.begin(), values.end(), other.values.begin(), values.begin(), std::minus<float>());
-
-        // x() -= other.x();
-        // y() -= other.y();
-        // z() -= other.z();
         return *this;
     }
 
     Point3D& operator*=(const float scalar)
     {
         std::transform(values.begin(), values.end(), values.begin(), [scalar](float val){ return val * scalar; });
-        // x() *= scalar;
-        // y() *= scalar;
-        // z() *= scalar;
         return *this;
     }
 
@@ -147,10 +137,8 @@ struct Point3D
 
     float length() const 
     {
-        //return std::sqrt(x() * x() + y() * y() + z() * z());
         return std::sqrt(std::reduce(values.begin(), values.end(), 0.f, [](float v1, float v2){ return v1 + (v2*v2); }));
     }
-    //float length() const { return std::sqrt(std::reduce(values.begin(), values.end(), 0, [](float v1, float v2){ return (v1*v1) + (v2*v2);})); }
 
     float distance_to(const Point3D& other) const { return (*this - other).length(); }
 

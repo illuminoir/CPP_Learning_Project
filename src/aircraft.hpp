@@ -11,7 +11,7 @@
 #include <string>
 #include <string_view>
 
-class Aircraft : public GL::Displayable, public GL::DynamicObject
+class Aircraft : public GL::Displayable
 {
 private:
     const AircraftType& type;
@@ -47,7 +47,6 @@ private:
 
     Aircraft(const Aircraft&) = delete;
     Aircraft& operator=(const Aircraft&) = delete;
-    bool operator<(Aircraft&);
 
 public:
     Aircraft(const AircraftType& type_, const std::string_view& flight_number_, const Point3D& pos_,
@@ -61,7 +60,6 @@ public:
         fuel { fuel_ }
     {
         speed.cap_length(max_speed());
-        GL::display_queue.emplace_back(this);
 
     }
 
@@ -70,20 +68,17 @@ public:
     bool is_out_of_sim() const;
     inline void crash() { has_crashed = true;}
     bool is_low_on_fuel() const;
-    int get_fuel() { return fuel; }
+    float get_fuel() { return fuel; }
     bool has_left_airport() const { return has_landed && !is_on_ground(); }
 
-    ~Aircraft() 
-    {
-        GL::display_queue.erase(std::find(GL::display_queue.begin(), GL::display_queue.end(), this));
-    }
+    ~Aircraft(){}
 
     const std::string& get_flight_num() const { return flight_number; }
     float distance_to(const Point3D& p) const { return pos.distance_to(p); }
 
-    void display() const override;
-    bool move(double delta_time) override;
-    void refill(int& fuel_stock);
+    void display() const;
+    bool move(double delta_time);
+    void refill(float& fuel_stock);
 
     friend class Tower;
 };
