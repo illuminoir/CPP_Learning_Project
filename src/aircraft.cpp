@@ -77,9 +77,10 @@ void Aircraft::operate_landing_gear()
     }
 }
 
-void Aircraft::add_waypoint(const Waypoint& wp, const bool front)
+template<bool front>
+void Aircraft::add_waypoint(const Waypoint& wp)
 {
-    if (front)
+    if constexpr (front)
     {
         waypoints.push_front(wp);
     }
@@ -103,14 +104,23 @@ bool Aircraft::move(double delta_time)
 {   
     if (waypoints.empty())
     {
-        waypoints = control.get_instructions(*this);
+        //const auto front = false;
+        for(const auto& wp: control.get_instructions(*this))
+        {
+            add_waypoint<false>(wp);
+        }
+        //waypoints = control.get_instructions(*this);
     }
 
     if (!is_at_terminal)
     {
-        if(is_circling() && waypoints.empty())
+        if(is_circling())
         {
-            waypoints = control.get_instructions(*this);
+            auto direction = control.reserve_terminal(*this);
+            if(!direction.empty())
+            {
+                waypoints = std::move(direction);
+            }
         }
         turn_to_waypoint();
         // move in the direction of the current speed
