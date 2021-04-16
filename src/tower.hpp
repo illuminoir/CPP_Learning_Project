@@ -3,10 +3,10 @@
 #include "waypoint.hpp"
 
 #include <algorithm>
+#include <map>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <map>
 
 class Airport;
 class Aircraft;

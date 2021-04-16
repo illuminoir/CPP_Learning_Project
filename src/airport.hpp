@@ -3,13 +3,13 @@
 #include "GL/displayable.hpp"
 #include "GL/dynamic_object.hpp"
 #include "GL/texture.hpp"
+#include "aircraft_manager.hpp"
 #include "airport_type.hpp"
 #include "geometry.hpp"
 #include "img/image.hpp"
 #include "runway.hpp"
 #include "terminal.hpp"
 #include "tower.hpp"
-#include "aircraft_manager.hpp"
 
 #include <vector>
 
@@ -21,11 +21,10 @@ private:
     const GL::Texture2D texture;
     std::vector<Terminal> terminals;
     Tower tower;
-    float fuel_stock = 0;
-    float ordered_fuel = 0;
+    float fuel_stock     = 0;
+    float ordered_fuel   = 0;
     int next_refill_time = 0;
     AircraftManager& manager;
-
 
     // reserve a terminal
     // if a terminal is free, return
@@ -57,22 +56,22 @@ private:
     Terminal& get_terminal(const size_t terminal_num) { return terminals.at(terminal_num); }
 
 public:
-    Airport(const AirportType& type_, const Point3D& pos_, const img::Image* image, AircraftManager& manager_, const float z_ = 1.0f) :
+    Airport(const AirportType& type_, const Point3D& pos_, const img::Image* image, AircraftManager& manager_,
+            const float z_ = 1.0f) :
         GL::Displayable { z_ },
         type { type_ },
         pos { pos_ },
         texture { image },
         terminals { type.create_terminals() },
         tower { *this },
-        manager { manager_}
+        manager { manager_ }
     {
         GL::display_queue.emplace_back(this);
         GL::move_queue.emplace(this);
     }
 
-
-    ~Airport() 
-    {        
+    ~Airport()
+    {
         GL::move_queue.erase(std::find(GL::move_queue.begin(), GL::move_queue.end(), this));
         GL::display_queue.erase(std::find(GL::display_queue.begin(), GL::display_queue.end(), this));
     }
@@ -83,11 +82,11 @@ public:
 
     bool move(double delta_time) override
     {
-        if(next_refill_time == 0)
+        if (next_refill_time == 0)
         {
             fuel_stock += ordered_fuel;
-            ordered_fuel = std::min(5000.f, manager.get_required_fuel());
-            next_refill_time = 100;
+            ordered_fuel     = std::min(MAX_ORDERED_FUEL, manager.get_required_fuel());
+            next_refill_time = REFILL_TIME;
             std::cout << "Fuel stock : " << fuel_stock << std::endl;
             std::cout << "Ordered fuel : " << ordered_fuel << std::endl;
         }
@@ -95,7 +94,7 @@ public:
         {
             next_refill_time--;
         }
-        
+
         for (auto& t : terminals)
         {
             t.refill_aircraft_if_needed(fuel_stock);

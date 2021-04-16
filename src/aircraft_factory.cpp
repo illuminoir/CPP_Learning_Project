@@ -1,8 +1,8 @@
 #include "aircraft_factory.hpp"
+
+#include "aircraft.hpp"
 #include "aircraft_manager.hpp"
 #include "tower.hpp"
-#include "aircraft.hpp"
-
 
 std::unique_ptr<Aircraft> AircraftFactory::create_random_aircraft(Tower& tower)
 {
@@ -13,7 +13,8 @@ bool AircraftFactory::flight_is_registered(std::string flight) const
 {
     auto it = registered_flights.find(flight);
 
-    if(it == registered_flights.end()){
+    if (it == registered_flights.end())
+    {
         return false;
     }
     return true;
@@ -22,9 +23,12 @@ bool AircraftFactory::flight_is_registered(std::string flight) const
 std::string AircraftFactory::generate_unique_flight_number()
 {
     std::string flight;
-    do {
-        flight = airlines[std::rand() % 8] + std::to_string(1000 + (rand() % 9000));
-    } while(flight_is_registered(flight));
+    do
+    {
+        flight = airlines[std::rand() % NUM_AIRLINES] +
+                 std::to_string(MIN_FLIGHT_NUMBER + (rand() % MAX_FLIGHT_NUMBER));
+    }
+    while (flight_is_registered(flight));
 
     registered_flights.emplace(flight);
 
@@ -34,9 +38,9 @@ std::string AircraftFactory::generate_unique_flight_number()
 std::unique_ptr<Aircraft> AircraftFactory::create_aircraft(const AircraftType& type, Tower& tower)
 {
     const std::string flight_number = generate_unique_flight_number();
-    const float angle               = (rand() % 1000) * 2 * 3.141592f / 1000.f; // random angle between 0 and 2pi
-    const Point3D start             = Point3D { std::sin(angle), std::cos(angle), 0 } * 3 + Point3D { 0, 0, 2 };
-    const Point3D direction         = (-start).normalize();
+    const float angle               = (rand() % 1000) * 2 * PI / 1000.f; // random angle between 0 and 2pi
+    const Point3D start = Point3D { std::sin(angle), std::cos(angle), 0.f } * 3.f + Point3D { 0.f, 0.f, 2.f };
+    const Point3D direction = (-start).normalize();
 
     auto fuel = fuel_rd_dist(rengine);
 

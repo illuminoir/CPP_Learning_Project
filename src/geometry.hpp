@@ -1,63 +1,75 @@
 #pragma once
 
 #include <algorithm>
-#include <numeric>
 #include <array>
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <numeric>
+#include <utility>
 
-template<typename type, const int dimension>
-class Point {
+template <typename Type, const int dimension> class Point
+{
 public:
-    std::array<type, dimension>values;
+    std::array<Type, dimension> values;
 
     Point() = default;
 
-    Point(type x, type y) : values { x, y }
+    template <typename... T> Point(Type first, T&&... args) : values { first, std::forward<T>(args)... }
     {
-        //static_assert(dimension == 2, "Initializing a Point2D requires two arguments");
+        static_assert(sizeof...(args) + 1 == dimension,
+                      "Incorrect amount of arguments when constructing Point object");
     }
 
-    Point(type x, type y, type z) : values { x, y, z }
+    Type& x() { return values[0]; }
+    Type x() const { return values[0]; }
+
+    Type& y()
     {
-        //static_assert(dimension != 3, "Initializing a Point3D requires three arguments");
+        static_assert(dimension >= 2, "y coordinate only available when dimension is higher than 1");
+        return values[1];
+    }
+    Type y() const
+    {
+        static_assert(dimension >= 2, "y coordinate only available when dimension is higher than 1");
+        return values[1];
     }
 
-    type& x() { return values[0]; }
-    type x() const { return values[0]; }
-
-    type& y() { return values[1]; }
-    type y() const { return values[1]; }
-
-    type& z() { return values[2]; }
-    type z() const 
-    { 
-        static_assert(dimension >= 3, "z() coordinate only exists when dimension is bigger than 2");
-        return values[2]; 
+    Type& z()
+    {
+        static_assert(dimension >= 3, "z coordinate only exists when dimension is higher than 2");
+        return values[2];
+    }
+    Type z() const
+    {
+        static_assert(dimension >= 3, "z coordinate only exists when dimension is higher than 2");
+        return values[2];
     }
 
-    Point& operator+=(const Point other)
+    Point& operator+=(const Point& other)
     {
-        std::transform(values.begin(), values.end(), other.values.begin(), values.begin(), std::plus<type>());
+        std::transform(values.begin(), values.end(), other.values.begin(), values.begin(), std::plus<Type>());
         return *this;
     }
 
-    Point& operator-=(const Point other)
+    Point& operator-=(const Point& other)
     {
-        std::transform(values.begin(), values.end(), other.values.begin(), values.begin(), std::minus<type>());
+        std::transform(values.begin(), values.end(), other.values.begin(), values.begin(),
+                       std::minus<Type>());
         return *this;
     }
 
-    Point& operator*=(const type scalar)
+    Point& operator*=(const Type scalar)
     {
-        std::transform(values.begin(), values.end(), values.begin(), [scalar](type val){ return val * scalar; });
+        std::transform(values.begin(), values.end(), values.begin(),
+                       [scalar](Type val) { return val * scalar; });
         return *this;
     }
 
     Point& operator*=(const Point& other)
     {
-        std::transform(values.begin(), values.end(), other.values.begin(), values.begin(), std::multiplies<type>());
+        std::transform(values.begin(), values.end(), other.values.begin(), values.begin(),
+                       std::multiplies<Type>());
         return *this;
     }
 
@@ -67,7 +79,7 @@ public:
         result += other;
         return result;
     }
-        
+
     Point operator-(const Point& other) const
     {
         Point result = *this;
@@ -80,9 +92,8 @@ public:
         Point result = *this;
         result *= other;
         return result;
-
     }
-    Point operator*(const type scalar) const
+    Point operator*(const Type scalar) const
     {
         Point result = *this;
         result *= scalar;
@@ -93,27 +104,22 @@ public:
     {
         std::string msg;
 
-        msg += "(";
-        msg += std::to_string(x());
-        msg += ",";
-        msg += std::to_string(y());
-        if(dimension == 3)
-        {
-            msg += ",";
-            msg += std::to_string(z());
-        }
-        msg += ")";
-
-        return msg;
+        using namespace std::string_literals;
+        return "("s +
+               std::accumulate(std::next(values.begin()), values.end(), std::to_string(values[0]),
+                               [](const std::string& acc, float val)
+                               { return acc + ","s + std::to_string(val); }) +
+               ")"s;
     }
 
-    float length() const 
+    float length() const
     {
-        return std::sqrt(std::reduce(values.begin(), values.end(), 0.f, [](float v1, float v2){ return v1 + (v2*v2); }));
+        return std::sqrt(std::reduce(values.begin(), values.end(), 0.f,
+                                     [](float acc, float val) { return acc + (val * val); }));
     }
 
     float distance_to(const Point& other) const { return (*this - other).length(); }
-    
+
     Point& normalize(const float target_len = 1.0f)
     {
         const float current_len = length();
@@ -140,23 +146,15 @@ public:
     }
 
     Point operator-() const
-    { 
-        std::transform(v)
-        if(dimension == 2)
-        {
-            return Point { -x(), -y() }; 
-        }
-        else
-        {
-            return Point { -x(), -y(), -z() };
-        }
+    {
+        Point result = *this;
+        result *= (-1);
+        return result;
     }
-
 };
 
 using Point2D = Point<float, 2>;
 using Point3D = Point<float, 3>;
-
 
 // our 3D-coordinate system will be tied to the airport: the runway is parallel to the x-axis, the z-axis
 // points towards the sky, and y is perpendicular to both thus,
@@ -172,8 +170,8 @@ inline void test_generic_points()
     Point<float, 2> p2;
     auto p3 = p1 + p2;
     p1 += p2;
-    p1 *= 3; //ou 3.f, 3.0 en fonction du type de Point
+    p1 *= 3; // ou 3.f, 3.0 en fonction du type de Point
     p3 *= 2;
 
-    //Point3D { 0, 0 };
+    // Point3D { 0, 0 };
 }

@@ -1,13 +1,14 @@
 #pragma once
 
 #include "GL/displayable.hpp"
+#include "aircraft_crash.hpp"
 #include "aircraft_types.hpp"
 #include "config.hpp"
 #include "geometry.hpp"
 #include "tower.hpp"
 #include "waypoint.hpp"
-#include <stdlib.h>
 
+#include <stdlib.h>
 #include <string>
 #include <string_view>
 
@@ -31,7 +32,7 @@ private:
     // the next two waypoints such that Z's distance to the next waypoint is
     // half our distance so: |w1 - pos| = d and [w1 - w2].normalize() = W and Z
     // = w1 + W*d/2
-    void turn_to_waypoint();
+    void turn_to_waypoint(double delta_time);
     void turn(Point3D direction);
 
     // select the correct tile in the plane texture (series of 8 sprites facing
@@ -41,8 +42,7 @@ private:
     void arrive_at_terminal();
     // deploy and retract landing gear depending on next waypoints
     void operate_landing_gear();
-    template<bool>
-    void add_waypoint(const Waypoint& wp);
+    template <bool> void add_waypoint(const Waypoint& wp);
     bool is_on_ground() const { return pos.z() < DISTANCE_THRESHOLD; }
     float max_speed() const { return is_on_ground() ? type.max_ground_speed : type.max_air_speed; }
 
@@ -61,18 +61,17 @@ public:
         fuel { fuel_ }
     {
         speed.cap_length(max_speed());
-
     }
 
     bool has_terminal() const;
     bool is_circling() const;
     bool is_out_of_sim() const;
-    inline void crash() { has_crashed = true;}
+    void crash() { has_crashed = true; }
     bool is_low_on_fuel() const;
-    float get_fuel() { return fuel; }
+    float get_fuel() const { return fuel; }
     bool has_left_airport() const { return has_landed && !is_on_ground(); }
 
-    ~Aircraft(){}
+    ~Aircraft() {}
 
     const std::string& get_flight_num() const { return flight_number; }
     float distance_to(const Point3D& p) const { return pos.distance_to(p); }

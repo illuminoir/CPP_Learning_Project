@@ -9,19 +9,16 @@
 class Terminal : public GL::DynamicObject
 {
 private:
-    unsigned int service_progress    = SERVICE_CYCLES;
-    Aircraft* current_aircraft = nullptr;
+    unsigned int service_progress = SERVICE_CYCLES;
+    Aircraft* current_aircraft    = nullptr;
     const Point3D pos;
 
     Terminal(const Terminal&) = delete;
     Terminal& operator=(const Terminal&) = delete;
 
 public:
-    Terminal(const Point3D& pos_) : pos { pos_ } {}
-    ~Terminal()
-    {
-        GL::move_queue.erase(std::find(GL::move_queue.begin(), GL::move_queue.end(), this));
-    }
+    explicit Terminal(const Point3D& pos_) : pos { pos_ } {}
+    ~Terminal() {}
 
     bool in_use() const { return current_aircraft != nullptr; }
     bool is_servicing() const { return service_progress < SERVICE_CYCLES; }
@@ -43,6 +40,13 @@ public:
         }
     }
 
+    void abort_service()
+    {
+        std::cout << "liberating airport from crashed aircraft " << current_aircraft->get_flight_num()
+                  << '\n';
+        current_aircraft = nullptr;
+    }
+
     bool move(double) override
     {
         if (in_use() && is_servicing() && !current_aircraft->is_low_on_fuel())
@@ -55,7 +59,7 @@ public:
 
     void refill_aircraft_if_needed(float& fuel_stock)
     {
-        if(in_use() && is_servicing() && current_aircraft->is_low_on_fuel())
+        if (in_use() && is_servicing() && current_aircraft->is_low_on_fuel())
         {
             current_aircraft->refill(fuel_stock);
         }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "aircraft_manager.hpp"
 #include "aircraft_factory.hpp"
+#include "aircraft_manager.hpp"
 
 class Airport;
 struct AircraftType;
@@ -26,7 +26,7 @@ private:
 
 public:
     TowerSimulation(int argc, char** argv);
-    ~TowerSimulation();
+    ~TowerSimulation() = default;
 
     void launch();
 };

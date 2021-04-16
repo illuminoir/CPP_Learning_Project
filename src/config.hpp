@@ -1,7 +1,7 @@
 #pragma once
 
-#include "img/media_path.hpp"
 #include "geometry.hpp"
+#include "img/media_path.hpp"
 
 #include <stdexcept>
 
@@ -16,7 +16,7 @@ constexpr float SPEED_THRESHOLD = 0.05f;
 constexpr float SINK_FACTOR = 0.1f;
 // distances below this distance are considered equal (planes crash, waypoints
 // are reached, etc)
-constexpr float DISTANCE_THRESHOLD = 0.05f;
+constexpr float DISTANCE_THRESHOLD = 0.1f;
 // each aircraft sprite has 8 tiles
 constexpr unsigned char NUM_AIRCRAFT_TILES = 8;
 // size of the plane-sprite on screen
@@ -29,29 +29,18 @@ constexpr float DEFAULT_ZOOM = 2.0f;
 constexpr size_t DEFAULT_WINDOW_WIDTH  = 800;
 constexpr size_t DEFAULT_WINDOW_HEIGHT = 600;
 
-class AircraftCrash : public std::runtime_error
-{
-    public:
-        AircraftCrash(std::string flight_number, Point3D pos, Point3D speed, std::string reason)
-            : std::runtime_error { build_error_msg(flight_number, pos, speed, reason) }
-        {}
+constexpr size_t NUM_AIRLINES       = 8;
+constexpr size_t NUM_AIRCRAFT_TYPES = 3;
 
-    private:
-        static std::string build_error_msg(std::string flight_number, Point3D pos, 
-                Point3D speed, std::string reason)
-        {
-            using namespace std::string_literals;
+constexpr size_t MIN_FLIGHT_NUMBER = 1000;
+constexpr size_t MAX_FLIGHT_NUMBER = 9000;
 
-            std::string msg;
-            msg += "Aircraft ";
-            msg += flight_number;
-            msg += " crashed at position ";
-            msg += pos.to_string();
-            msg += " and speed ";
-            msg += speed.to_string();
-            msg += " because it";
-            msg += reason;
+constexpr float MIN_FUEL         = 150.f;
+constexpr float MAX_FUEL         = 3000.f;
+constexpr float MAX_ORDERED_FUEL = 5000.f;
 
-            return msg;
-        }
-};
+constexpr float FUEL_DECR = 0.5f;
+
+constexpr float PI = 3.141592f;
+
+constexpr int REFILL_TIME = 100;
