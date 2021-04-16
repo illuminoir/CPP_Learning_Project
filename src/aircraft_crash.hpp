@@ -6,13 +6,13 @@
 class AircraftCrash : public std::runtime_error
 {
 public:
-    AircraftCrash(std::string flight_number, Point3D pos, Point3D speed, std::string reason) :
+    AircraftCrash(const std::string& flight_number, Point3D& pos, Point3D& speed, const std::string& reason) :
         std::runtime_error { build_error_msg(flight_number, pos, speed, reason) }
     {}
 
 private:
-    static std::string build_error_msg(std::string flight_number, Point3D pos, Point3D speed,
-                                       std::string reason)
+    static std::string build_error_msg(const std::string& flight_number, Point3D& pos, Point3D& speed,
+                                       const std::string& reason)
     {
         using namespace std::string_literals;
 

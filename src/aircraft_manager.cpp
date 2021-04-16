@@ -64,11 +64,12 @@ void AircraftManager::add_aircraft(std::unique_ptr<Aircraft> aircraft)
 
 float AircraftManager::get_required_fuel() const
 {
-    auto missing_fuel = [](float sum, const std::unique_ptr<Aircraft>& a)
+    auto missing_fuel = [](float sum, const std::unique_ptr<Aircraft>& aircraft)
     {
-        if (a->is_low_on_fuel() && !a->has_left_airport())
+        if (aircraft->is_low_on_fuel() && !aircraft->has_left_airport())
         {
-            return sum + MAX_FUEL - a->get_fuel();
+            auto aircraft_missing_fuel = MAX_FUEL - aircraft->get_fuel();
+            return sum + aircraft_missing_fuel;
         }
         return sum;
     };

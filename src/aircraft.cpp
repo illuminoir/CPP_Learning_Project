@@ -96,19 +96,17 @@ bool Aircraft::is_out_of_sim() const
 
 bool Aircraft::is_low_on_fuel() const
 {
-    return fuel < 200;
+    return fuel < 200.;
 }
 
 bool Aircraft::move(double delta_time)
 {
     if (waypoints.empty())
     {
-        // const auto front = false;
         for (const auto& wp : control.get_instructions(*this))
         {
             add_waypoint<false>(wp);
         }
-        // waypoints = control.get_instructions(*this);
     }
 
     if (!is_at_terminal)
