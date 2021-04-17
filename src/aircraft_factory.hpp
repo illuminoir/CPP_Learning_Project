@@ -18,7 +18,7 @@ private:
     std::mt19937 rengine;
     std::uniform_real_distribution<float> fuel_rd_dist;
 
-    bool AircraftFactory::flight_is_registered(const std::string& flight) const;
+    bool flight_is_registered(const std::string& flight) const;
     std::string generate_unique_flight_number();
 
 public:
